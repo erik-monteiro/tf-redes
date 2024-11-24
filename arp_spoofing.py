@@ -3,16 +3,6 @@ import struct
 import time
 import threading
 
-def habilitar_ip_forwarding():
-    """Habilita o IP Forwarding no Linux para permitir o MITM."""
-    try:
-        with open("/proc/sys/net/ipv4/ip_forward", "w") as f:
-            f.write("1")
-        print("[INFO] IP Forwarding habilitado.")
-    except PermissionError:
-        print("[ERRO] Execute o script como root para habilitar o IP Forwarding.")
-        exit(1)
-
 def criar_pacote_arp(src_mac, src_ip, dst_mac, dst_ip, opcode):
     """Cria um pacote ARP Ethernet com o opcode especificado."""
     eth_header = struct.pack(

