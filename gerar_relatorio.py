@@ -10,7 +10,6 @@ def gerar_relatorio_html():
             print("[ERRO] O log está vazio. Certifique-se de que os pacotes estão sendo capturados.")
             return
 
-        # Gerar o arquivo HTML
         with open("relatorio.html", "w") as relatorio:
             relatorio.write("<html><head><title>Relatório de Rede</title></head><body>")
             relatorio.write("<h1>Relatório de Rede</h1>")
@@ -26,7 +25,6 @@ def gerar_relatorio_html():
     except Exception as e:
         print(f"[ERRO] Ocorreu um erro ao gerar o relatório: {e}")
 
-# Função que inicia a geração do relatório em thread separada
 def gerar_relatorio_em_thread():
     relatorio_thread = threading.Thread(target=gerar_relatorio_html)
     relatorio_thread.start()

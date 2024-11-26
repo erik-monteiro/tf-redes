@@ -3,8 +3,9 @@ import struct
 import time
 import os
 
-
+# Cria um pacote ICMP Echo Request.
 def criar_pacote_icmp(seq):
+
 
     id_icmp = os.getpid() & 0xFFFF 
     header = struct.pack("bbHHh", 8, 0, 0, id_icmp, seq) 
@@ -12,7 +13,7 @@ def criar_pacote_icmp(seq):
     header = struct.pack("bbHHh", 8, 0, checksum, id_icmp, seq)
     return header
 
-
+# Calcula o checksum de um cabeçalho ICMP.
 def calcular_checksum(header):
 
     if len(header) % 2:
@@ -23,7 +24,7 @@ def calcular_checksum(header):
     checksum = ~checksum & 0xFFFF
     return socket.htons(checksum)
 
-
+# Envia um pacote ICMP Echo Request para um host e retorna o tempo de resposta.
 def enviar_ping(host, timeout):
 
     try:

@@ -3,20 +3,19 @@ import time
 from icmp import enviar_ping
 from datetime import datetime
 
-
-
+# Função para calcular os IPs válidos na rede, excluindo o endereço de rede e broadcast.
 def calcular_intervalo_ips(rede):
     """Calcula os IPs válidos na rede, excluindo o endereço de rede e broadcast."""
     rede_obj = ipaddress.ip_network(rede, strict=False)
     return [str(ip) for ip in rede_obj.hosts()]
 
-
+# Função para calcular o gateway (geralmente o primeiro IP válido da rede).
 def calcular_gateway(rede):
     """Calcula o gateway (geralmente o primeiro IP válido da rede)."""
     rede_obj = ipaddress.ip_network(rede, strict=False)
     return str(list(rede_obj.hosts())[0])
 
-
+# Função para executar a varredura na rede e identificar hosts ativos.
 def executar_varredura(rede, timeout):
     """
     Realiza a varredura na rede para identificar hosts ativos e calcula o tempo total de varredura.
