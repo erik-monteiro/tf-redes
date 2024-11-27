@@ -8,10 +8,9 @@ def salvar_historico(ip, url):
     url = ''.join(ch for ch in url if ch.isprintable())
 
     with open("historico.html", "a") as log_file:
-        log_file.write(f'<div style="margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">\n')
-        log_file.write(f'<p><strong>{datetime.now()} | IP: {ip}</strong></p>\n')
-        log_file.write(f'<p><em>URL: {url}</em></p>\n')
-        log_file.write('</div>\n')
+        log_file.write('<html><header><title>Histórico de Navegação</title></header><body><ul>\n')
+        log_file.write(f'<li>{datetime.now().strftime("%d/%m/%Y %H:%M")} - {ip} - <a href="{url}">{url}</a></li>\n')
+        log_file.write('</ul></body></html>\n')
 
 
 def extrair_http(pacote):
