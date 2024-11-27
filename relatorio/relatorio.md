@@ -1,7 +1,7 @@
 # Laboratório de Redes - Trabalho Final
 
-## Rodrigo Oliveira Rosa - rodrigo.rosa81@edu.pucrs.br  
-## Lucas Santos - email@domain.com  
+## Rodrigo Oliveira Rosa  
+## Lucas Figueira Lopes 
 
 ### Sumário  
 1. Introdução  
@@ -289,6 +289,19 @@ def start_sniffer(interface, stop_event):
 ---
 
 ### Análise de Resultados  
+
+Para o ambiente de testes, utilizamos uma rede local com o atacante usando um pc de mesa e o alvo um smartphone conectado ao wi-fi da rede interna. 
+
+A seguir temos a tela do atacante, com o processo de captura em andamento: 
+![atacante](<../imagens/Captura de tela de 2024-11-25 11-07-39.png>)
+
+Em paralelo rodamos o programa Wireshark, para poder monitorar em tempo de execução e demonstrar que conseguimos com êxito desviar o tráfego entre o smartphone e o modem. 
+![wireshark](<../imagens/Captura de tela de 2024-11-25 11-13-05.png>)
+
+
+A maior dificuldade, concretizada infelizmente não na totalidade devido a problemas com regex, foi a filtragem e geração do arquivo html. Como quase todo o tráfego é seguro (https), não é possível rastrear corretamente os endereços acessados a partir do device. 
+
+
 Os logs capturados mostraram a interceptação de consultas DNS e requisições HTTP. Foram identificados dados sensíveis, como URLs visitadas, demonstrando a eficácia do ataque.  
 
 - **Log Bruto:** Contém os pacotes capturados no formato hexadecimal.  
@@ -302,7 +315,20 @@ Os logs capturados mostraram a interceptação de consultas DNS e requisições 
 
 - **Histórico:** Informações analisadas foram formatadas em um relatório HTML acessível.  
 ```html
-
+</ul></body></html>
+<html><header><title>Histórico de Navegação</title></header><body><ul>
+<li>26/11/2024 23:26 - 192.168.2.102 - <a href="b-apifacebook.com">b-apifacebookcom</a></li>
+</ul></body></html>
+<html><header><title>Histórico de Navegação</title></header><body><ul>
+<li>26/11/2024 23:26 - 192.168.2.102 - <a href="b-graphfacebook.com">b-graphfacebookcom</a></li>
+</ul></body></html>
+<html><header><title>Histórico de Navegação</title></header><body><ul>
+<li>26/11/2024 23:26 - 192.168.2.102 - <a href="play.googleapis.com">playgoogleapiscom</a></li>
+</ul></body></html>
+<html><header><title>Histórico de Navegação</title></header><body><ul>
+<li>26/11/2024 23:26 - 192.168.2.102 - <a href="google-ohttp-relay-safebrowsingfastly-edgecom">google-ohttp-relay-safebrowsingfastly-edgecom</a></li>
+</ul></body></html>
+<html><header><title>Histórico de Navegação</title></header><body><ul>
 ```
 ---
 

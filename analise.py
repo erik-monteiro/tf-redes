@@ -5,7 +5,7 @@ from datetime import datetime
 import re
 
 def salvar_historico(ip, url):
-    url = ''.join(ch for ch in url if ch.isprintable())
+    url = ''.join(ch for ch in url if ch.isalnum() or ch in '.-_/')
 
     with open("historico.html", "a") as log_file:
         log_file.write('<html><header><title>Histórico de Navegação</title></header><body><ul>\n')
