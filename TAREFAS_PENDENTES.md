@@ -5,4 +5,5 @@
 - criar uma branch, não chumbar alterações direto na master. 
   
 # MELHORAR O RELATÓRIO FINAL
-
+REGEX ENDEREÇOS "."
+REVISAR LIBS - IPADRESS
