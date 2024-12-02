@@ -1,10 +1,8 @@
 import sys
 import threading
-from varredura import executar_varredura, calcular_gateway
-from arpspoof import habilitar_ip_forwarding, realizar_arp_spoofing
-from sniffer import start_sniffer
-from gerar_relatorio import gerar_relatorio_html
-import time
+from e1_varredura import executar_varredura, calcular_gateway
+from e2_arpspoof import habilitar_ip_forwarding, realizar_arp_spoofing
+from e3_sniffer import start_sniffer
 
 def executar_etapa2_thread(hosts_ativos, gateway, interface):
     if not hosts_ativos:
@@ -68,8 +66,6 @@ def etapa1():
 
     return hosts_ativos, gateway, interface
 
-def etapa_final():
-    gerar_relatorio_html()
 
 if __name__ == "__main__":
     hosts_ativos = None
@@ -91,7 +87,6 @@ if __name__ == "__main__":
             elif escolha == "3":
                 etapa3()
             elif escolha == "4":
-                etapa_final()
                 sys.exit()
             else:
                 print("Opção inválida.")
