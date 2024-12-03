@@ -31,11 +31,13 @@ def executar_varredura(rede, timeout):
 
     inicio_varredura = time.time()
 
+    seq = 1
     for ip in hosts:
-        tempo_resposta = enviar_ping(ip, timeout)
+        tempo_resposta = enviar_ping(ip, timeout, seq)
         if tempo_resposta is not None:
             hosts_ativos.append((ip, tempo_resposta))
             print(f"Host ativo: {ip} - Tempo de resposta: {tempo_resposta:.2f} ms")
+        seq+=1
 
     fim_varredura = time.time()
     tempo_total = fim_varredura - inicio_varredura
