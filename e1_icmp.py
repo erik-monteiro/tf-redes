@@ -21,13 +21,12 @@ def calcular_checksum(header):
     checksum = ~checksum & 0xFFFF
     return socket.htons(checksum)
 
-def enviar_ping(host, timeout):
+def enviar_ping(host, timeout, seq):
 
     try:
         icmp = socket.IPPROTO_ICMP 
         with socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp) as sock:
             sock.settimeout(timeout / 1000)
-            seq = 1 
             packet = criar_pacote_icmp(seq)
             sock.sendto(packet, (host, 1))
             start = time.time()
@@ -36,7 +35,7 @@ def enviar_ping(host, timeout):
             tempo_resposta = (time.time() - start) * 1000 
 
             tipo, codigo, checksum, id_icmp, seq_resposta = struct.unpack("bbHHh", resposta[20:28])
-            if tipo == 0 and id_icmp == (os.getpid() & 0xFFFF) and seq_resposta == seq:
+            if endereco[0] == host and tipo == 0 and id_icmp == (os.getpid() & 0xFFFF) and seq_resposta == seq:
                 return int(tempo_resposta) 
             else:
                 return None
