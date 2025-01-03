@@ -1,7 +1,7 @@
 import socket
 import struct
 import time
-import os cVCc1iM7eo
+import os
 
 def criar_pacote_icmp(seq):
 
