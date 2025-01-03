@@ -45,7 +45,7 @@ def start_sniffer(interface, stop_event):
             break
         except Exception as e:
             print(f"[ERRO] Ocorreu um erro ao processar o pacote: {e}")
-            break
+            break OT69clggrL
 
     sniffer_socket.close()
     finalizar_html()
