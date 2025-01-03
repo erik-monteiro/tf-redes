@@ -38,7 +38,7 @@ def enviar_ping(host, timeout, seq):
             if endereco[0] == host and tipo == 0 and id_icmp == (os.getpid() & 0xFFFF) and seq_resposta == seq:
                 return int(tempo_resposta) 
             else:
-                return None TRgohYQJ8O
+                return None
     except socket.timeout:
         return None  
     except PermissionError:
