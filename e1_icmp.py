@@ -8,7 +8,7 @@ def criar_pacote_icmp(seq):
     id_icmp = os.getpid() & 0xFFFF 
     header = struct.pack("bbHHh", 8, 0, 0, id_icmp, seq) 
     checksum = calcular_checksum(header)
-    header = struct.pack("bbHHh", 8, 0, checksum, id_icmp, seq) CcQMURIAmF
+    header = struct.pack("bbHHh", 8, 0, checksum, id_icmp, seq)
     return header
 
 def calcular_checksum(header):
